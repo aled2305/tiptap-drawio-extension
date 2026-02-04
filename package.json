@@ -1,0 +1,44 @@
+{
+  "name": "tiptap-drawio-extension",
+  "version": "0.1.0",
+  "description": "Tiptap diagram block extension with Draw.io Vue adapter",
+  "author": "Aled Evans",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --dts --format esm,cjs",
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "@tiptap/core": "^3.18.0",
+    "@tiptap/vue-3": "^3.18.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@tiptap/core": "^3.18.0",
+    "@tiptap/vue-3": "^3.18.0",
+    "@vue/compiler-sfc": "^3.5.0",
+    "tsup": "^8.1.0",
+    "typescript": "^5.6.0",
+    "vue": "^3.5.0"
+  },
+  "keywords": [
+    "tiptap",
+    "drawio",
+    "diagram",
+    "vue"
+  ],
+  "license": "MIT"
+}
