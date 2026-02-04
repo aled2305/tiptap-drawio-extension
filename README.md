@@ -14,13 +14,32 @@ This extension adds a `diagramBlock` node to Tiptap and pairs with a Vue adapter
 - Core extension: `src/extensions/diagramBlock.ts`
 - Vue adapter: `src/components/DrawioModal.vue`
 
-## Install (local)
+## Install (npm)
 
-This repo is not published as a package yet. To use it locally in this project:
+```bash
+npm install tiptap-drawio-extension
+```
 
-1. Import the extension and component
-2. Register the node in your editor
-3. Wire the modal `save`/`exit` events to the editor commands
+Then load the styles once in your app entry:
+
+```ts
+import "tiptap-drawio-extension/style.css"
+```
+
+## Install (local pack)
+
+If you want to test locally without publishing:
+
+```bash
+npm run build
+npm pack
+```
+
+Then in your other repo:
+
+```bash
+npm install /absolute/path/to/tiptap-drawio-extension-0.1.x.tgz
+```
 
 ## Usage (Vue 3)
 
@@ -29,8 +48,11 @@ This repo is not published as a package yet. To use it locally in this project:
 import { ref, watch } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { DiagramBlock } from './extensions/diagramBlock'
-import DrawioModal from './components/DrawioModal.vue'
+import { DiagramBlock, DrawioModal } from 'tiptap-drawio-extension'
+import 'tiptap-drawio-extension/style.css'
+
+// Required: Draw.io embed URL (use your own host if needed)
+const DRAWIO_URL = 'https://embed.diagrams.net/?embed=1&proto=json&spin=1'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -47,8 +69,6 @@ const isDiagramModalOpen = ref(false)
 const diagramXmlDraft = ref('')
 const diagramSvgDraft = ref('')
 const diagramEditId = ref<string | null>(null)
-
-const DRAWIO_URL = 'https://embed.diagrams.net/?embed=1&proto=json&spin=1'
 
 const editor = useEditor({
   extensions: [StarterKit, DiagramBlock],
@@ -109,6 +129,10 @@ watch(isDiagramModalOpen, open => {
   />
 </template>
 ```
+
+Notes:
+- `DRAWIO_URL` is required and must point at a Draw.io embed host. The default above uses the official hosted embed.
+- The modal only saves when the user clicks save in Draw.io. Exiting without saving emits empty data.
 
 ## Draw.io modal behavior
 

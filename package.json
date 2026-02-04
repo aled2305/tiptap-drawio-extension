@@ -1,8 +1,16 @@
 {
   "name": "tiptap-drawio-extension",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Tiptap diagram block extension with Draw.io Vue adapter",
   "author": "Aled Evans",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aled2305/tiptap-drawio-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aled2305/tiptap-drawio-extension/issues"
+  },
+  "homepage": "https://github.com/aled2305/tiptap-drawio-extension#readme",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
