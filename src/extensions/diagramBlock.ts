@@ -1,4 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core'
+import type { CommandProps } from '@tiptap/core'
 
 export interface DiagramBlockAttrs {
   id: string | null
@@ -62,7 +63,7 @@ export const DiagramBlock = Node.create({
     return {
       insertDiagramBlock:
         (options: { pos?: number; id?: string; xml?: string; svg?: string } = {}) =>
-        ({ commands }) => {
+        (props: CommandProps) => {
           const id = options.id ?? createDiagramId()
           const xml = options.xml ?? ''
           const svg = options.svg ?? ''
@@ -72,20 +73,20 @@ export const DiagramBlock = Node.create({
           }
           const success =
             typeof options.pos === 'number'
-              ? commands.insertContentAt(options.pos, payload)
-              : commands.insertContent(payload)
+              ? props.commands.insertContentAt(options.pos, payload)
+              : props.commands.insertContent(payload)
           this.storage.lastInsertedId = success ? id : null
           return success
         },
       updateDiagramBlock:
         (options: { pos?: number; xml: string; svg: string; id?: string }) =>
-        ({ editor, tr }) => {
-          const pos = options.pos ?? editor.state.selection.$from.pos
-          const node = editor.state.doc.nodeAt(pos)
+        (props: CommandProps) => {
+          const pos = options.pos ?? props.editor.state.selection.$from.pos
+          const node = props.editor.state.doc.nodeAt(pos)
           if (!node || node.type.name !== this.name) {
             return false
           }
-          tr.setNodeMarkup(pos, this.type, {
+          props.tr.setNodeMarkup(pos, this.type, {
             ...node.attrs,
             xml: options.xml,
             svg: options.svg,
@@ -95,9 +96,9 @@ export const DiagramBlock = Node.create({
         },
       updateDiagramBlockById:
         (options: { id: string; xml: string; svg: string }) =>
-        ({ editor, tr }) => {
+        (props: CommandProps) => {
           let targetPos: number | null = null
-          editor.state.doc.descendants((node, pos) => {
+          props.editor.state.doc.descendants((node: any, pos: number) => {
             if (node.type.name === this.name && node.attrs?.id === options.id) {
               targetPos = pos
               return false
@@ -105,9 +106,9 @@ export const DiagramBlock = Node.create({
             return true
           })
           if (targetPos == null) return false
-          const node = editor.state.doc.nodeAt(targetPos)
+          const node = props.editor.state.doc.nodeAt(targetPos)
           if (!node) return false
-          tr.setNodeMarkup(targetPos, this.type, {
+          props.tr.setNodeMarkup(targetPos, this.type, {
             ...node.attrs,
             xml: options.xml,
             svg: options.svg,
@@ -117,10 +118,10 @@ export const DiagramBlock = Node.create({
         },
       removeDiagramBlockById:
         (options: { id: string }) =>
-        ({ editor, tr }) => {
+        (props: CommandProps) => {
           let targetPos: number | null = null
           let targetNodeSize = 0
-          editor.state.doc.descendants((node, pos) => {
+          props.editor.state.doc.descendants((node: any, pos: number) => {
             if (node.type.name === this.name && node.attrs?.id === options.id) {
               targetPos = pos
               targetNodeSize = node.nodeSize
@@ -129,15 +130,17 @@ export const DiagramBlock = Node.create({
             return true
           })
           if (targetPos == null) return false
-          tr.delete(targetPos, targetPos + targetNodeSize)
+          const from = targetPos as number
+          const to = from + Number(targetNodeSize)
+          props.tr.delete(from, to)
           return true
         },
       handleDiagramExit:
         (options: { id: string; xml?: string; svg?: string }) =>
-        ({ editor, tr }) => {
+        (props: CommandProps) => {
           let targetPos: number | null = null
           let targetNode: any = null
-          editor.state.doc.descendants((node, pos) => {
+          props.editor.state.doc.descendants((node: any, pos: number) => {
             if (node.type.name === this.name && node.attrs?.id === options.id) {
               targetPos = pos
               targetNode = node
@@ -153,12 +156,14 @@ export const DiagramBlock = Node.create({
           const hasExisting = Boolean(targetNode.attrs?.xml || targetNode.attrs?.svg)
 
           if (!hasPayload && !hasExisting) {
-            tr.delete(targetPos, targetPos + targetNode.nodeSize)
+            const from = targetPos as number
+            const to = from + Number(targetNode.nodeSize)
+            props.tr.delete(from, to)
             return true
           }
 
           if (hasPayload) {
-            tr.setNodeMarkup(targetPos, this.type, {
+            props.tr.setNodeMarkup(targetPos, this.type, {
               ...targetNode.attrs,
               xml: nextXml || targetNode.attrs?.xml || '',
               svg: nextSvg || targetNode.attrs?.svg || '',
@@ -168,7 +173,7 @@ export const DiagramBlock = Node.create({
 
           return true
         },
-    }
+    } as any
   },
   addNodeView() {
     const nodeName = this.name
